@@ -7,7 +7,7 @@
     FROM    Emotion;
 
 --3. How many poems are in the database?
-  SELECT    COUNT(*)
+  SELECT    COUNT(*) AS PoemCount
     FROM    Poem;
 
 --4. Sort authors alphabetically by name. What are the names of the top 76 authors?
@@ -32,7 +32,7 @@ ORDER BY    a.Name;
 ORDER BY    a.Name;
 
 --7. What is the total number of words in all poems in the database?
-  SELECT    SUM(WordCount)
+  SELECT    SUM(WordCount) AS TotalWordCount
     FROM    Poem;
 
 --8. Which poem has the fewest characters?
@@ -41,19 +41,19 @@ ORDER BY    a.Name;
 ORDER BY    CharCount;
 
 --9. How many authors are in the third grade?
-  SELECT    COUNT(*)
+  SELECT    COUNT(*) AS Authors
     FROM    Author
    WHERE    GradeId = 3;
 
 --10. How many authors are in the first, second or third grades?
-  SELECT    COUNT(*)
+  SELECT    COUNT(*) AS Authors
     FROM    Author
    WHERE    GradeId = 3
             OR GradeId = 2
             OR GradeId = 1;
 
 --11. What is the total number of poems written by fourth graders?
-  SELECT    COUNT(*)
+  SELECT    COUNT(*) AS Poems
     FROM    Poem p
             LEFT JOIN Author a
             ON p.AuthorId = a.Id
@@ -139,12 +139,16 @@ GROUP BY    g.Name, e.Name
 ORDER BY    PoemCount DESC;
 
 --20. Which gender has the least number of poems with an emotion of fear?
-
-SELECT PoemId, EmotionId
-FROM PoemEmotion
-WHERE EmotionId = 3
-GROUP BY
-
-SELECT DISTINCT COUNT(PoemId)
-FROM PoemEmotion
-WHERE EmotionId = 3
+  SELECT    TOP 1 g.name AS Gender, e.Name AS Emotion, count(p.Id) AS PoemCount
+    FROM    Gender g 
+            LEFT JOIN Author a
+            ON g.Id = a.GenderId
+            LEFT JOIN Poem p
+            ON a.Id = p.AuthorId
+            LEFT JOIN PoemEmotion pe
+            ON p.Id = pe.PoemId
+            LEFT JOIN Emotion e
+            ON pe.EmotionId = e.Id
+GROUP BY    g.Name, e.Name
+  Having    e.Name = 'fear'
+ORDER BY    PoemCount;
